@@ -1,6 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-
+#include <contactlistprovider.h>
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +18,8 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     engine.load(url);
+    qmlRegisterType<ContactListProvider>("ContactListProvider", 1, 0, "Provider");
+
 
     return app.exec();
 }
