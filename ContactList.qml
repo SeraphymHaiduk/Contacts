@@ -14,14 +14,6 @@ ListView{
        color: "red"
     }
     model: ListModel{
-        ListElement{
-            txt: "1"
-        }
-        ListElement{
-            txt: "2"
-        }
-        ListElement{
-            txt: "3"
-        }
+        id:listModel
     }
 }

@@ -10,11 +10,11 @@ class ContactListProvider : public QObject
 public:
     ContactListProvider(QObject* parent = 0);
 
-    Q_INVOKABLE QVariantMap getChunk(int indx,int count);
-    Q_INVOKABLE QVariantMap find(QString str,int lim);
+    Q_INVOKABLE QVariantList getChunk(int indx,int count);
+    Q_INVOKABLE QVariantList find(QString str,int lim);
     Q_INVOKABLE QVariantList getLetters();
 
-    Q_INVOKABLE void addContact(QVariantMap contact);
+    Q_INVOKABLE void addContact(QString icon = "",QString name = "undefined",QString number = "");
     Q_INVOKABLE void setContactSettings(QVariantMap settings);
     Q_INVOKABLE void deleteContact(int id);
 

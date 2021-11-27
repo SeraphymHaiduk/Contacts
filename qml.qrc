@@ -3,5 +3,11 @@
         <file>main.qml</file>
         <file>ContactList.qml</file>
         <file>Header.qml</file>
+        <file>ContactInfo.qml</file>
+        <file>pics/defaultIcon.kra</file>
+        <file>pics/defaultIcon.png</file>
+        <file>pics/pen.kra</file>
+        <file>pics/pen.png</file>
+        <file>pics/plus.png</file>
     </qresource>
 </RCC>

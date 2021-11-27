@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
 #endif
 
     QGuiApplication app(argc, argv);
+    qmlRegisterType<ContactListProvider>("ContactListProvider", 1, 0, "Provider");
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
@@ -18,7 +19,6 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     engine.load(url);
-    qmlRegisterType<ContactListProvider>("ContactListProvider", 1, 0, "Provider");
 
 
     return app.exec();

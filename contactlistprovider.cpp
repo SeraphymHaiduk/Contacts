@@ -30,21 +30,20 @@ ContactListProvider::ContactListProvider(QObject* parent):QObject(parent)
     /*q.exec("INSERT INTO list('name')"
            "VALUES ('vova')");
     q.exec("INSERT INTO list('name')"
-           "VALUES ('boba')");
+           "VALUES ('boba')");*/
     q.exec("SELECT * FROM list");
     q.next();
-    qDebug() << q.record().indexOf("name");
-    qDebug() << q.value(0).toString();
     q.next();
-    qDebug() << q.value(0).toString();
-    getChunk(1,2);
+    qDebug() << q.value(1).toString();
+    qDebug() << q.value(2).toString();
+    /*getChunk(1,2);
     find("vo",2);
-    getLetters();*/
-
+    getLetters();*
+    */
 }
 
 
-QVariantMap ContactListProvider::getChunk(int indx,int count){
+QVariantList ContactListProvider::getChunk(int indx,int count){
     QSqlQuery q;
     q.exec(QString("SELECT * "
                 "FROM (SELECT ROW_NUMBER() OVER(ORDER BY name) num,* "
@@ -53,18 +52,22 @@ QVariantMap ContactListProvider::getChunk(int indx,int count){
                 "LIMIT %2").arg(indx).arg(count)
                 );
     qDebug() << q.lastError().text();
-    QVariantMap res;
+    QVariantList res;
+    QVariantList buf;
     QList<QString> columns = {"id","name","number","icon"};
+    int c = 0;
     while(q.next()){
         for(int i = 0;i<columns.size();i++){
-            res[columns[i]] = q.value(i+1);
-            qDebug() << res[columns[i]].toString();
+            buf.append(q.value(i+1));
+            res.append(buf);
+            qDebug() << res[i].toString();
         }
         qDebug() <<"\n";
+        c++;
     }
     return res;
 }
-QVariantMap ContactListProvider::find(QString str,int lim){
+QVariantList ContactListProvider::find(QString str,int lim){
     QSqlQuery q;
     q.exec( QString("SELECT * "
             "FROM list "
@@ -73,12 +76,16 @@ QVariantMap ContactListProvider::find(QString str,int lim){
             "LIMIT %3"
             ).arg(str.size()).arg(str).arg(lim));
     qDebug()<<"find: "+q.lastError().text();
-    QVariantMap res;
+    QVariantList res;
+    QVariantList buf;
+
     QList<QString> columns = {"id","name","number","icon"};
+    int c = 0;
     while(q.next()){
         for(int i = 0;i<columns.size();i++){
-            res[columns[i]] = q.value(i);
-            qDebug() << res[columns[i]].toString();
+            buf[i] = q.value(i);
+            res[c] = buf;
+            qDebug() << res[i].toString();
         }
         qDebug() <<"\n";
     }
@@ -98,13 +105,13 @@ QVariantList ContactListProvider::getLetters(){
     }
     return res;
 }
-void ContactListProvider::addContact(QVariantMap contact){
+void ContactListProvider::addContact(QString icon,QString name,QString number){
     QSqlQuery q;
     q.exec(QString("INSERT INTO list(name,number,icon)"
-                   "values(%1,%2,%3)")
-                    .arg(contact["name"].toString())
-                    .arg(contact["number"].toString())
-                    .arg(contact["icon"].toString()));
+                   "values('%1','%2','%3')")
+                    .arg(name)
+                    .arg(number)
+                    .arg(icon));
     qDebug() << "addContact(): "+q.lastError().text();
 }
 
