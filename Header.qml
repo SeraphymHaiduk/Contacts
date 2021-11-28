@@ -6,6 +6,8 @@ Rectangle{
         id:root
         color: "blue"
         property int pageActive: 1
+        signal finding(bool b)
+        signal find(string text)
         signal pageChanged(int index)
         Column{
             height: parent.height/2
@@ -21,7 +23,27 @@ Rectangle{
                 margins: 8
             }
             color:"white"
-            radius: height
+            radius: height/2
+            Text{
+                text: "🔍"
+                anchors{
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    leftMargin: 10
+                    verticalCenterOffset: 5
+                }
+                height: parent.height
+                width: height
+                font.pixelSize: parent.height*0.6
+            }
+            MouseArea{
+                anchors.fill: parent
+                onReleased: {
+                    finding(true)
+                    findingHead.opacity = 1
+                    console.log("finding pressed")
+                }
+            }
         }
             Row{
                 height: parent.height/2
@@ -41,6 +63,13 @@ Rectangle{
                     onReleased: {
                         console.log("favorites")
                         pageChanged(0)
+                    }
+
+                    Text{
+                        anchors.centerIn: parent
+                        text: "★"
+                        font.pixelSize: parent.height/2
+                        color: "white"
                     }
                     Rectangle{
                         visible: favoriteBt.active
@@ -66,6 +95,12 @@ Rectangle{
                         console.log("recent calls")
                         pageChanged(1)
                     }
+                    Text{
+                        anchors.centerIn: parent
+                        text: "⌚"
+                        font.pixelSize: parent.height/2
+                        color: "white"
+                    }
                     Rectangle{
                         visible: recentBt.active
                         anchors{
@@ -90,6 +125,12 @@ Rectangle{
                         console.log("contacts")
                         pageChanged(2)
                     }
+                    Text{
+                        anchors.centerIn: parent
+                        text: "🙍"
+                        font.pixelSize: parent.height/2
+                        color: "white"
+                    }
                     Rectangle{
                         visible: contactsBt.active
                         anchors{
@@ -102,5 +143,61 @@ Rectangle{
                     }
                 }
             }
+        }
+        Rectangle{
+            id:findingHead
+            anchors.fill: parent
+            opacity: 0
+            color: "#fff0f0f0"
+            MouseArea{
+                anchors.fill: parent
+                enabled: findingHead.opacity
+            }
+            Rectangle{
+                color: "white"
+                height: parent.height/2
+                width: parent.width
+                anchors{
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                    margins: 10
+                }
+                Button{
+                    id:backBt
+                    enabled: findingHead.opacity
+                    anchors{
+                        top: parent.top
+                        bottom: parent.bottom
+                    }
+                    width: height
+                    onReleased: {
+                        finding(false)
+                        findingHead.opacity = 0
+
+                    }
+                }
+                Rectangle{
+                    anchors{
+                        fill: parent
+                        leftMargin: backBt.width
+                    }
+                    clip: true
+                    TextInput{
+                        id:findingTextInput
+                        anchors.fill: parent
+                        enabled: findingHead.opacity
+                        font.pixelSize: parent.height*0.7
+                        onTextChanged: find(findingTextInput.text)
+                    }
+                }
+
+
+
+            }
+            Behavior on opacity{
+                    NumberAnimation{ duration: 200}
+            }
+
         }
      }

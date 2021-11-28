@@ -23,7 +23,9 @@ ContactListProvider::ContactListProvider(QObject* parent):QObject(parent)
             "id INTEGER PRIMARY KEY AUTOINCREMENT, "
             "name TEXT NOT NULL,"
             "number TEXT,"
-            "icon TEXT"
+            "icon TEXT,"
+            "favorite INT,"
+            "recent_call TEXT"
             " )"
            );
 
@@ -53,11 +55,9 @@ QVariantList ContactListProvider::getChunk(int indx,int count){
                 );
     qDebug() << q.lastError().text();
     QVariantList res;
-    QVariantList buf;
-    QList<QString> columns = {"id","name","number","icon"};
     int c = 0;
     while(q.next()){
-        for(int i = 0;i<columns.size();i++){
+        for(int i = 0;i<6;i++){
             res.append(q.value(i+1));
             qDebug() << res[i].toString();
         }
@@ -66,24 +66,34 @@ QVariantList ContactListProvider::getChunk(int indx,int count){
     }
     return res;
 }
+QVariantList ContactListProvider::getFavorites(){
+    QSqlQuery q;
+    q.exec(QString("SELECT * "
+                   "FROM list "
+                   "WHERE favorite = 1 "
+                   "ORDER BY name"));
+    QVariantList list;
+    while(q.next()){
+        for(int i = 0;i<6;i++){
+            list.append(q.value(i).toString());
+        }
+    }
+    return list;
+}
+
 QVariantList ContactListProvider::find(QString str,int lim){
     QSqlQuery q;
     q.exec( QString("SELECT * "
             "FROM list "
-            "WHERE SUBSTR(name,1,%1) == '%2' OR SUBSTR(number,1,%1) == '%2' "
+            "WHERE UPPER(SUBSTR(name,1,%1)) == UPPER('%2') OR UPPER(SUBSTR(number,1,%1)) == UPPER('%2') "
             "ORDER BY name "
             "LIMIT %3"
             ).arg(str.size()).arg(str).arg(lim));
     qDebug()<<"find: "+q.lastError().text();
     QVariantList res;
-    QVariantList buf;
-
-    QList<QString> columns = {"id","name","number","icon"};
-    int c = 0;
     while(q.next()){
-        for(int i = 0;i<columns.size();i++){
-            buf[i] = q.value(i);
-            res[c] = buf;
+        for(int i = 0;i<6;i++){
+            res.append(q.value(i));
             qDebug() << res[i].toString();
         }
         qDebug() <<"\n";
@@ -116,7 +126,9 @@ void ContactListProvider::addContact(QString icon,QString name,QString number){
 
 void ContactListProvider::call(quint32 id){}
 void ContactListProvider::deleteContact(int id){
-
+    QSqlQuery q;
+    q.exec(QString("DELETE FROM list "
+                   "WHERE id = %1").arg(id));
 }
 void ContactListProvider::setContactSettings(int id,QString icon,QString name,QString number){
     QSqlQuery q;
@@ -130,3 +142,15 @@ void ContactListProvider::setContactSettings(int id,QString icon,QString name,QS
            );
     qDebug() << "setContactSettings(): " + q.lastError().text();
 };
+void ContactListProvider::addToFavorites(int id){
+        QSqlQuery q;
+        q.exec(QString("UPDATE list "
+                       "SET favorite = 1 "
+                       "WHERE id = %1").arg(id));
+}
+void ContactListProvider::removeFromFavorites(int id){
+    QSqlQuery q;
+    q.exec(QString("UPDATE list "
+                   "SET favorite = 0 "
+                   "WHERE id = %1").arg(id));
+}

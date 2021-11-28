@@ -5,18 +5,19 @@ import QtGraphicalEffects 1.12
 ListView{
     id:root
     spacing: 10
-    property int id: id
-    signal contactOpen(int id,string ico,string name,string number)
+    signal contactOpen(int id,string ico,string name,string number,bool isFavorite,string recentCall)
+
     delegate: Button{
-        id:bt
+       id:bt
        height: root.height*0.1
        width: root.width
+
        background: Rectangle{
            radius: 5
            color: bt.pressed?"white":"red"
        }
         onReleased: {
-            contactOpen(id,image,name,number)
+            contactOpen(id,image,name,number,isFavorite,recentCall)
         }
        Image {
            id: img
@@ -62,4 +63,8 @@ ListView{
        }
 
     }
+
+
+
+
 }

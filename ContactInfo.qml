@@ -11,9 +11,13 @@ Item{
     property string defaultIcon: "pics/defaultIcon.png"
     property string defaultName: "name"
     property string defaultNumber: "number"
-
+    property bool isFavorite: false
+    property string recentCall: ""
     property bool existed: false
     property int id: -1
+
+    property alias deleteBt: deleteBt
+    property alias addToFavoriteBt: addToFavoriteBt
     FileDialog {
         id: fileDialog
         title: "Please choose a file"
@@ -132,6 +136,44 @@ Item{
 
             }
         }
+        Column{
+            id:settings
+            property bool show: false
+            height: show?parent.height*0.12:0
+            width: parent.width*0.5
+            anchors{
+                right: parent.right
+                top: parent.top
+            }
+
+            Behavior on height{
+                NumberAnimation{
+                    duration: 200
+                }
+            }
+             Button{
+                 id:addToFavoriteBt
+                 visible: parent.height
+                 text: isFavorite?"Remove from favorites":"Add to favorites"
+                 anchors{
+                     left: parent.left
+                     right: parent.right
+                 }
+
+                 height: parent.height/2
+                 enabled: parent.show
+             }
+             Button{
+                 id:deleteBt
+                 text: "Delete contact"
+                 anchors{
+                     left: parent.left
+                     right: parent.right
+                 }
+                 height: parent.height/2
+                 enabled: parent.show
+             }
+        }
         header: ToolBar{
             id:header
             height: parent.height*0.075
@@ -177,6 +219,7 @@ Item{
                     width: height
                     Layout.alignment: Qt.AlignRight
                     background: Rectangle{
+                        id:btBackground
                         color: headerBackground.color
                         Text{
                             text:"✓"
@@ -187,9 +230,39 @@ Item{
                     }
                     onReleased: {
                         contactChanged(newIcon,nameInput.text,numberInput.text)
-                        backPressed()
+                        defaultIcon = newIcon===""?defaultIcon:newIcon
+                        defaultName = nameInput.text===""?defaultName:nameInput.text
+                        defaultNumber = numberInput.text===""?defaultNumber:numberInput.text
+                        nameInput.text = ""
+                        numberInput.text = ""
+                        newIcon = ""
                     }
                 }
+               Button{
+                    id:settingsBt
+                    visible: !acceptChangesBt.visible
+                    enabled: visible
+
+                    anchors{
+                        top: parent.top
+                        bottom: parent.bottom
+                        right: parent.right
+                    }
+                    width: height
+                    background:  Rectangle{
+                        color: headerBackground.color
+                        Text{
+                            text: "⋮"
+                            color: settingsBt.pressed?"black":"white"
+                            anchors.centerIn: parent
+                            font.pixelSize: parent.height*0.6
+                        }
+                    }
+                    onPressed: {
+                        settings.show = !settings.show
+                    }
+               }
+
         }
     }
 

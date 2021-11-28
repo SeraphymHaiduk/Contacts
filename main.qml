@@ -28,69 +28,120 @@ Window {
     Provider{
      id:provider
     }
+
     Component{
        id:pageCompoment
         Page{
+
         SwipeView{
             id:swipeControl
-            currentIndex: 1
+            currentIndex: 2
             anchors{
                fill: parent
             }
             Rectangle{
                 id:favoritesPage
-                Image {
-                    id: img
-                    source: fileDialog.fileUrl
+                ContactList{
+                    id:favoriteContactsList
+                    anchors{
+                        fill:parent
+                        margins: 8
+                    }
+                    property variant container
+                    model: ListModel{
+                        id: favoritesListModel
+                    }
+                    onContactOpen: {
+                        stack.push(infoComponent)
+                        stack.contactOpen(id,ico,name,number,isFavorite,recentCall)
+                    }
+                    function showContacts(){
+                        container = provider.getFavorites()
+                        console.log(container)
+                        for(var i = 0;i<container.length;i+=6){
+                            favoritesListModel.append({  "id":contactsList.map[i],
+                                                 "name":favoriteContactsList.container[i+1],
+                                                 "number":favoriteContactsList.container[i+2],
+                                                 "image":favoriteContactsList.container[i+3],
+                                                 "isFavorite":true,
+                                                 "recentCall":favoriteContactsList.container[i+5]
+                                             })
+                        }
+                    }
+
+                    Component.onCompleted: {
+                        favoriteContactsList.showContacts()
+                    }
+                    Connections{
+                        target: stack
+                        function onUpdateList(){
+                            favoritesListModel.clear()
+                            favoriteContactsList.showContacts()
+                        }
+                    }
                 }
             }
             Rectangle{
-                id: recentCallsPage
+                id:recentCallsPage
                  ContactList{
-                     id:contactList
+                    id:recentCallsContactsList
+                    anchors{
+                        fill:parent
+                        margins: 8
+                    }
+
+                 }
+            }
+            Rectangle{
+                id: contactPage
+                 ContactList{
+                    id:contactsList
+                    property variant map
+                    property variant contactsCount
                     anchors{
                         fill:parent
                         margins: 8
                     }
                     model: ListModel{
                         id:listModel
-
                     }
                     onContactOpen: {
                         stack.push(infoComponent)
-                        stack.contactOpen(id,ico,name,number)
+                        stack.contactOpen(id,ico,name,number,isFavorite,recentCall)
                     }
-                    function showContacts(){
-                        contactsPage.map = provider.getChunk(1,20)
-                        for(var i = 0;i<contactsPage.map.length;i+=4){
-                            listModel.append({"id":contactsPage.map[i],"name":contactsPage.map[i+1],"number":contactsPage.map[i+2],"image":contactsPage.map[i+3]})
+                    onMovementEnded: {
+                        if(contactsList.atYEnd){
+                            showContacts(listModel.count,10)
                         }
                     }
-                 }
-                 Connections{
-                     target: stack
-                     function onUpdateList(){
-                         listModel.clear()
-                         contactList.showContacts()
-                     }
-                 }
-            }
 
-            Rectangle{
-                id:contactsPage
-                property variant map
-                 ContactList{
-                    id:mainContactsList
-                    anchors{
-                        fill:parent
-                        margins: 8
+                    function showContacts(start,count){
+                        contactsList.map = provider.getChunk(start,count)
+                        for(var i = 0;i<contactsList.map.length;i+=6){
+                            listModel.append({  "id":contactsList.map[i],
+                                                 "name":contactsList.map[i+1],
+                                                 "number":contactsList.map[i+2],
+                                                 "image":contactsList.map[i+3],
+                                                 "isFavorite":contactsList.map[i+4]?1:0,
+                                                 "recentCall":contactsList.map[i+5],
+                                             })
+                        }
+                    }
+                    Connections{
+                        target: stack
+                        function onUpdateList(){
+                            listModel.clear()
+                            contactsList.showContacts(1,10)
+                        }
                     }
                     Component.onCompleted: {
-                        contactList.showContacts()
+                        contactsList.showContacts(1,10)
                     }
                  }
 
             }
+
+
             onCurrentIndexChanged : {
                 console.log(currentIndex)
             }
@@ -141,9 +192,71 @@ Window {
              }
              height: parent.height*0.15
              pageActive: swipeControl.currentIndex
-
+             onFinding: {
+                if(b){
+                    findPage.opacity = 1
+                }
+                else{
+                    findPage.opacity = 0
+                }
+             }
+             onFind: {
+                findingfContactsList.show(text)
+             }
 
          }
+
+             Rectangle{
+                 id:findPage
+                 opacity: 0
+                 visible: opacity
+                 anchors.fill: parent
+                 color: "white"
+                    MouseArea{
+                        anchors.fill: parent
+                        visible: findPage.opacity
+                        enabled: findPage.opacity
+
+                    }
+                    Behavior on opacity{
+                            NumberAnimation{ duration: 200}
+                    }
+                    ContactList{
+                        id:findingfContactsList
+                        property variant container
+                        anchors{
+                            fill: parent
+                            margins: 8
+                        }
+                        model: ListModel{
+                            id:findingfContactsListModel
+                        }
+                        onContactOpen: {
+                            stack.push(infoComponent)
+                            stack.contactOpen(id,ico,name,number,isFavorite,recentCall)
+                        }
+                        function show(text){
+                            findingfContactsListModel.clear()
+                            container = provider.find(text,20)
+                            for(var i = 0;i<findingfContactsList.container.length;i+=6){
+                                findingfContactsListModel.append({  "id":findingfContactsList.container[i],
+                                                     "name":findingfContactsList.container[i+1],
+                                                     "number":findingfContactsList.container[i+2],
+                                                     "image":findingfContactsList.container[i+3],
+                                                     "isFavorite":findingfContactsList.container[i+4]?1:0,
+                                                     "recentCall":findingfContactsList.container[i+5]
+                                                 })
+                            }
+                        }
+                        Connections{
+                            target:stack
+                            function onUpdateList(){
+                                show()
+                            }
+                        }
+                    }
+             }
+
         }
     }
     StackView{
@@ -151,7 +264,7 @@ Window {
         anchors.fill: parent
         initialItem: pageCompoment
         signal updateList()
-        signal contactOpen(int id,string ico,string name,string number)
+        signal contactOpen(int id,string ico,string name,string number,bool favorite,string recentCall)
 
     }
     Component{
@@ -172,18 +285,37 @@ Window {
                else{
                     provider.addContact(ico,name,number)
                }
-                info.backPressed()
            }
             Connections{
                 target: stack
-                function onContactOpen(id,ico,name,number){
+                function onContactOpen(id,ico,name,number,isFavorite,recentCall){
+                    console.log("contact opened")
                     info.existed = true
                     info.id = id
                     info.defaultIcon = ico===""?"pics/defaultIcon.png":ico
                     info.defaultName = name===""?"name":name
                     info.defaultNumber = number===""?"number":number
+                    info.isFavorite = isFavorite
                     console.log("yes")
                 }
+            }
+            addToFavoriteBt.onReleased: {
+                if(isFavorite){
+                    provider.removeFromFavorites(info.id)
+                }
+                else{
+                    provider.addToFavorites(info.id)
+                }
+                info.isFavorite = !info.isFavorite
+            }
+            deleteBt.onReleased: {
+                if(id!=-1){
+                    provider.deleteContact(info.id)
+                }
+                else{
+                    console.log("Вы ещё не создали контакт")
+                }
+                backPressed()
             }
         }
     }
