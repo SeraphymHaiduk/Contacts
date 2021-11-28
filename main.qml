@@ -30,7 +30,6 @@ Window {
     }
     Component{
        id:pageCompoment
-
         Page{
         SwipeView{
             id:swipeControl
@@ -48,31 +47,47 @@ Window {
             Rectangle{
                 id: recentCallsPage
                  ContactList{
+                     id:contactList
                     anchors{
                         fill:parent
                         margins: 8
                     }
+                    model: ListModel{
+                        id:listModel
+
+                    }
+                    onContactOpen: {
+                        stack.push(infoComponent)
+                        stack.contactOpen(id,ico,name,number)
+                    }
+                    function showContacts(){
+                        contactsPage.map = provider.getChunk(1,20)
+                        for(var i = 0;i<contactsPage.map.length;i+=4){
+                            listModel.append({"id":contactsPage.map[i],"name":contactsPage.map[i+1],"number":contactsPage.map[i+2],"image":contactsPage.map[i+3]})
+                        }
+                    }
+                 }
+                 Connections{
+                     target: stack
+                     function onUpdateList(){
+                         listModel.clear()
+                         contactList.showContacts()
+                     }
                  }
             }
+
             Rectangle{
                 id:contactsPage
-                property variant map: []
+                property variant map
                  ContactList{
                     id:mainContactsList
                     anchors{
                         fill:parent
                         margins: 8
                     }
-                    function showContacts(){
-                        console.log("axaxa")
-                        contactsPage.map = provider.getChunk(1,20)
-                        console.log(contactsPage.map[7]) //настроить отрисовку контактов
-                    }
-
                     Component.onCompleted: {
-                        showContacts()
+                        contactList.showContacts()
                     }
-
                  }
 
             }
@@ -135,19 +150,41 @@ Window {
         id:stack
         anchors.fill: parent
         initialItem: pageCompoment
+        signal updateList()
+        signal contactOpen(int id,string ico,string name,string number)
+
     }
     Component{
         id:infoComponent
         ContactInfo{
             id:info
             onBackPressed: {
+                stack.updateList()
                 stack.pop()
-                console.log("back pressed")
             }
            onContactChanged: {
-                console.log(ico,name,number)
-                provider.addContact(ico,name,number)
+               if(existed){
+                    provider.setContactSettings(info.id,
+                                                ico==""?info.defaultIcon:ico,
+                                                name==""?info.defaultName:name,
+                                                number==""?info.defaultNumber:number)
+               }
+               else{
+                    provider.addContact(ico,name,number)
+               }
+                info.backPressed()
            }
+            Connections{
+                target: stack
+                function onContactOpen(id,ico,name,number){
+                    info.existed = true
+                    info.id = id
+                    info.defaultIcon = ico===""?"pics/defaultIcon.png":ico
+                    info.defaultName = name===""?"name":name
+                    info.defaultNumber = number===""?"number":number
+                    console.log("yes")
+                }
+            }
         }
     }
 }

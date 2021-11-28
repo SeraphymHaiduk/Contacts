@@ -58,8 +58,7 @@ QVariantList ContactListProvider::getChunk(int indx,int count){
     int c = 0;
     while(q.next()){
         for(int i = 0;i<columns.size();i++){
-            buf.append(q.value(i+1));
-            res.append(buf);
+            res.append(q.value(i+1));
             qDebug() << res[i].toString();
         }
         qDebug() <<"\n";
@@ -119,4 +118,15 @@ void ContactListProvider::call(quint32 id){}
 void ContactListProvider::deleteContact(int id){
 
 }
-void ContactListProvider::setContactSettings(QVariantMap){};
+void ContactListProvider::setContactSettings(int id,QString icon,QString name,QString number){
+    QSqlQuery q;
+    q.exec(QString("UPDATE list "
+                   "SET name = '%1', "
+                   "number = '%2', "
+                   "icon = '%3' "
+                   "WHERE id = %4")
+                   .arg(name,number,icon)
+                   .arg(id)
+           );
+    qDebug() << "setContactSettings(): " + q.lastError().text();
+};

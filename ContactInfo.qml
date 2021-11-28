@@ -1,12 +1,33 @@
 import QtQuick 2.4
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.12
+import QtQuick.Dialogs 1.0
 Item{
     signal backPressed()
     signal contactChanged(string ico, string name,string number)
     property bool nameInputChanged: nameInput.text!=""?true:false
     property bool numberInputChanged: numberInput.text!=""?true:false
     property string newIcon: ""
+    property string defaultIcon: "pics/defaultIcon.png"
+    property string defaultName: "name"
+    property string defaultNumber: "number"
+
+    property bool existed: false
+    property int id: -1
+    FileDialog {
+        id: fileDialog
+        title: "Please choose a file"
+        onAccepted: {
+            console.log("You chose: " + fileDialog.fileUrls)
+            newIcon = fileUrl
+            fileDialog.close()
+        }
+        onRejected: {
+            console.log("Canceled")
+            fileDialog.close()
+        }
+        Component.onCompleted: visible = false
+    }
     Page{
         anchors.fill: parent
         background: Rectangle{
@@ -17,7 +38,7 @@ Item{
             spacing: 10
             Image {
                 id: avatar
-                source: "pics/defaultIcon.png"
+                source: newIcon==""?defaultIcon:newIcon
                 anchors{
                     left: parent.left
                     right: parent.right
@@ -25,6 +46,33 @@ Item{
                 }
                 height: width
                 smooth: false
+                clip: true
+
+                Button{
+                    id:photoBt
+                    anchors{
+                        right: parent.right
+                        top: parent.top
+                        margins: 8
+                    }
+                    height: parent.height*0.15
+                    width: height
+                    background: Rectangle{
+                        color: photoBt.pressed?"white":"#ff808080"
+                        radius: height
+                        clip: true
+                        Image {
+                            source: "pics/pen.png"
+                            anchors.fill: parent
+                            anchors.margins: 5
+                            smooth: false
+                        }
+                    }
+
+                    onReleased: {
+                        fileDialog.open()
+                    }
+                }
             }
             Rectangle{
                 anchors{
@@ -38,6 +86,12 @@ Item{
                 Text{
                     id: name
                     visible: !nameInputChanged
+                    text: defaultName
+                    anchors{
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        leftMargin: 10
+                    }
                 }
                 TextInput{
                     id:nameInput
@@ -60,6 +114,12 @@ Item{
                 Text{
                     id:number
                     visible: !numberInputChanged
+                    text: defaultNumber
+                    anchors{
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        leftMargin: 10
+                    }
                 }
                 TextInput{
                     id:numberInput
