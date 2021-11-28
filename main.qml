@@ -4,7 +4,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.0
 import ContactListProvider 1.0
-
+import QtGraphicalEffects 1.2
 Window {
     id: mainWindow
     width: 400
@@ -163,7 +163,7 @@ Window {
            }
            background: Rectangle{
               radius: height
-              color: addBt.pressed?"white":"blue"
+              color: addBt.pressed?"plum":"lightblue"
               Text {
                   text: qsTr("+")
                   font.pixelSize: parent.height
@@ -182,6 +182,15 @@ Window {
            onReleased:{
                 stack.push(infoComponent)
            }
+        }
+        DropShadow{
+            anchors.fill: addBt
+                    horizontalOffset: 3
+                    verticalOffset: 3
+                    radius: 8.0
+                    samples: 17
+                    color: "#80000000"
+                    source: addBt
         }
 
          header: Header{
@@ -211,7 +220,7 @@ Window {
                  opacity: 0
                  visible: opacity
                  anchors.fill: parent
-                 color: "white"
+                 color: "#fff0f0f0"
                     MouseArea{
                         anchors.fill: parent
                         visible: findPage.opacity

@@ -4,7 +4,7 @@ import QtQuick.Controls.Styles 1.4
 
 Rectangle{
         id:root
-        color: "blue"
+        color: "lightblue"
         property int pageActive: 1
         signal finding(bool b)
         signal find(string text)
@@ -58,8 +58,10 @@ Rectangle{
                     property bool active: root.pageActive==0?1:0
                     background: Rectangle{
                             anchors.fill: parent
-                            color: favoriteBt.pressed?"white": root.color
-                            }
+                            gradient: Gradient{
+                                 GradientStop{position:0.0;color: root.color}
+                                 GradientStop{position:1.0;color: favoriteBt.pressed?"gray":"skyblue"}
+                            }                             }
                     onReleased: {
                         console.log("favorites")
                         pageChanged(0)
@@ -89,8 +91,10 @@ Rectangle{
                     property bool active: root.pageActive==1?1:0
                     background: Rectangle{
                             anchors.fill: parent
-                            color: recentBt.pressed?"white": root.color
-                            }
+                            gradient: Gradient{
+                                 GradientStop{position:0.0;color: root.color}
+                                 GradientStop{position:1.0;color: recentBt.pressed?"gray":"skyblue"}
+                            }                            }
                     onReleased: {
                         console.log("recent calls")
                         pageChanged(1)
@@ -119,8 +123,11 @@ Rectangle{
                     property bool active: root.pageActive==2?1:0
                     background: Rectangle{
                             anchors.fill: parent
-                            color: contactsBt.pressed?"white": root.color
+                            gradient: Gradient{
+                                 GradientStop{position:0.0;color: root.color}
+                                 GradientStop{position:1.0;color: contactsBt.pressed?"gray":"skyblue"}
                             }
+                    }
                     onReleased: {
                         console.log("contacts")
                         pageChanged(2)
@@ -148,7 +155,7 @@ Rectangle{
             id:findingHead
             anchors.fill: parent
             opacity: 0
-            color: "#fff0f0f0"
+            color: "lightblue"
             MouseArea{
                 anchors.fill: parent
                 enabled: findingHead.opacity

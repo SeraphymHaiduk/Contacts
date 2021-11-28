@@ -13,8 +13,22 @@ ListView{
        width: root.width
 
        background: Rectangle{
+           id:btBackground
            radius: 5
-           color: bt.pressed?"white":"red"
+           gradient: Gradient{
+                GradientStop{position:0.0;color: "lightblue"}
+                GradientStop{position:1.0;color: bt.pressed?"gray":"skyblue"}
+           }
+
+       }
+       DropShadow{
+           anchors.fill: btBackground
+                   horizontalOffset: 3
+                   verticalOffset: 3
+                   radius: 8.0
+                   samples: 17
+                   color: "#80000000"
+                   source: btBackground
        }
         onReleased: {
             contactOpen(id,image,name,number,isFavorite,recentCall)
@@ -39,6 +53,7 @@ ListView{
                     radius: height/2
                  }
            }
+
        }
 
        Text {

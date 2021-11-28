@@ -179,7 +179,10 @@ Item{
             height: parent.height*0.075
             background: Rectangle{
                 id:headerBackground
-                color: "blue"
+                gradient: Gradient{
+                     GradientStop{position:0.0;color: "lightblue"}
+                     GradientStop{position:1.0;color: "skyblue"}
+                }
                 anchors.fill: parent
             }
             anchors{
@@ -195,7 +198,10 @@ Item{
                     }
                     width: height
                     background: Rectangle{
-                        color: headerBackground.color
+                        gradient: Gradient{
+                             GradientStop{position:0.0;color: "lightblue"}
+                             GradientStop{position:1.0;color: backBt.pressed?"gray":"skyblue"}
+                        }
                         Text {
                             id: txt
                             color: backBt.pressed?"black":"white"
@@ -220,7 +226,10 @@ Item{
                     Layout.alignment: Qt.AlignRight
                     background: Rectangle{
                         id:btBackground
-                        color: headerBackground.color
+                        gradient: Gradient{
+                             GradientStop{position:0.0;color: "lightblue"}
+                             GradientStop{position:1.0;color: backBt.pressed?"gray":"skyblue"}
+                        }
                         Text{
                             text:"✓"
                             color: acceptChangesBt.pressed?"black":"white"
@@ -250,7 +259,10 @@ Item{
                     }
                     width: height
                     background:  Rectangle{
-                        color: headerBackground.color
+                        gradient: Gradient{
+                             GradientStop{position:0.0;color: "lightblue"}
+                             GradientStop{position:1.0;color: settingsBt.pressed?"gray":"skyblue"}
+                        }
                         Text{
                             text: "⋮"
                             color: settingsBt.pressed?"black":"white"
